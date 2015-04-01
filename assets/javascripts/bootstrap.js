@@ -1052,9 +1052,10 @@ if (typeof jQuery === 'undefined') {
 
   Modal.prototype.resize = function () {
     if (this.isShown) {
-      $(window).on('resize.bs.modal', $.proxy(this.handleUpdate, this))
+      this.resizeHandler = this.handleUpdate.bind(this);
+      $(window).on('resize.bs.modal', this.resizeHandler)
     } else {
-      $(window).off('resize.bs.modal')
+      $(window).off('resize.bs.modal', this.resizeHandler)
     }
   }
 
@@ -1062,7 +1063,9 @@ if (typeof jQuery === 'undefined') {
     var that = this
     this.$element.hide()
     this.backdrop(function () {
-      that.$body.removeClass('modal-open')
+      if (!$('.modal:visible').length) {
+        that.$body.removeClass('modal-open')
+      }
       that.resetAdjustments()
       that.resetScrollbar()
       that.$element.trigger('hidden.bs.modal')
